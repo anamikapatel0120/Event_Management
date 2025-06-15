@@ -1,285 +1,41 @@
-// const express = require('express');
-// const multer = require('multer');
-// const cors = require('cors');
-// const path = require('path');
-// require('dotenv').config();
-// const db = require('./db');
-// const http = require('http');
-// const socketSetup = require('./socket');
-
-// const app = express();
-// const server = http.createServer(app);
-// const socketIo = require('socket.io');
-// const io = socketIo(server, { cors: { origin: "*" } });
-
-// // Middleware
-// app.use(cors());
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// // Multer config
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => cb(null, 'uploads/'),
-//   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-// });
-// const upload = multer({ storage });
-
-// // ====== Auth Routes ======
-
-// // Register
-// app.post('/api/register', upload.single('profilePicture'), async (req, res) => {
-//   const { name, email, role, password, useDefault } = req.body;
-//   const imagePath = useDefault === 'true' || !req.file
-//     ? 'uploads/default-profile.png'
-//     : req.file.path;
-
-//   try {
-//     const existing = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-//     if (existing.rows.length > 0) {
-//       return res.status(400).json({ success: false, message: 'User already exists' });
-//     }
-
-//     await db.query(
-//       'INSERT INTO users(name, email, role, password, profile_picture) VALUES($1, $2, $3, $4, $5)',
-//       [name, email, role, password, imagePath]
-//     );
-
-//     res.status(201).json({ success: true, message: 'User registered successfully' });
-//   } catch (err) {
-//     console.error('Registration Error:', err);
-//     res.status(500).json({ success: false, message: 'Server error' });
-//   }
-// });
-
-// // Login
-// app.post('/api/login', async (req, res) => {
-//   const { emailOrName, role, password } = req.body;
-
-//   try {
-//     const result = await db.query(
-//       'SELECT * FROM users WHERE (email = $1 OR name = $1) AND role = $2',
-//       [emailOrName, role]
-//     );
-
-//     const user = result.rows[0];
-//     if (!user || user.password !== password) {
-//       return res.status(401).json({ success: false, message: 'Invalid credentials' });
-//     }
-
-//     res.json({ success: true, user });
-//   } catch (err) {
-//     console.error('Login Error:', err);
-//     res.status(500).json({ success: false, message: 'Server error' });
-//   }
-// });
-
-// // ====== Organizer Endpoints ======
-
-// // Create Event
-// app.post('/api/organizer/events', async (req, res) => {
-//   const { title, type, date, time, venue, platform, speakers, isLive } = req.body;
-//   try {
-//     const result = await db.query(
-//       `INSERT INTO events (title, type, date, time, venue, platform, speakers, is_live, organizer_id)
-//        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-//       [title, type, date, time, venue, platform, speakers, isLive, req.user.id]
-//     );
-//     res.status(201).json(result.rows[0]);
-//   } catch (err) {
-//     console.error('Event create error:', err);
-//     res.status(500).send('Server error');
-//   }
-// });
-
-// // Update Event
-// app.put('/api/organizer/events/:id', async (req, res) => {
-//   const { id } = req.params;
-//   const { title, type, date, time, venue, platform, speakers, isLive } = req.body;
-//   try {
-//     const result = await db.query(
-//       `UPDATE events SET title=$1,type=$2,date=$3,time=$4,venue=$5,platform=$6,
-//        speakers=$7,is_live=$8 WHERE id=$9 AND organizer_id=$10 RETURNING *`,
-//       [title, type, date, time, venue, platform, speakers, isLive, id, req.user.id]
-//     );
-//     res.json(result.rows[0]);
-//   } catch (err) {
-//     console.error('Event update error:', err);
-//     res.status(500).send('Server error');
-//   }
-// });
-
-// // Event Attendees
-// app.get('/api/organizer/events/:id/attendees', async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const result = await db.query(`
-//       SELECT users.name, users.email, attendees.seat_id, seats.label AS seat_label, attendees.booked_at
-//       FROM attendees
-//       JOIN users ON attendees.user_id = users.id
-//       JOIN seats ON attendees.seat_id = seats.id
-//       WHERE attendees.event_id = $1`, [id]);
-//     res.json(result.rows.map(r => ({
-//       ...r,
-//       booked_at: r.booked_at.toISOString()
-//     })));
-//   } catch (err) {
-//     console.error('Attendees fetch error:', err);
-//     res.status(500).send('Server error');
-//   }
-// });
-
-// // Event Stats
-// app.get('/api/organizer/events/:id/stats', async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const revenueRes = await db.query(
-//       `SELECT TO_CHAR(date,'Mon YYYY') AS month, SUM(price) AS total
-//        FROM attendees JOIN events USING(event_id)
-//        WHERE event_id = $1
-//        GROUP BY 1 ORDER BY date`, [id]
-//     );
-//     const ratingCounts = await db.query(
-//       `SELECT rating, COUNT(*) FROM feedback WHERE event_id = $1 GROUP BY rating`, [id]
-//     );
-//     const avgRatingRes = await db.query(
-//       `SELECT AVG(rating)::numeric(3,2) AS avg_rating FROM feedback WHERE event_id = $1`, [id]
-//     );
-//     const totalRes = await db.query(
-//       `SELECT COUNT(*) FROM attendees WHERE event_id = $1`, [id]
-//     );
-
-//     const revenue = revenueRes.rows.map(r => +r.total);
-//     const months = revenueRes.rows.map(r => r.month);
-//     const ratingsCount = [1, 2, 3, 4, 5].map(i => {
-//       const row = ratingCounts.rows.find(r => +r.rating === i);
-//       return row ? +row.count : 0;
-//     });
-//     const avgRating = avgRatingRes.rows[0].avg_rating || 0;
-//     const totalAttendees = +totalRes.rows[0].count;
-
-//     res.json({ revenue, months, ratingsCount, avgRating, totalAttendees });
-//   } catch (err) {
-//     console.error('Stats fetch error:', err);
-//     res.status(500).send('Server error');
-//   }
-// });
-
-// // Organizer Profile
-// app.get('/api/organizer/profile', async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const prof = await db.query('SELECT name, email, profile_picture FROM users WHERE id = $1', [userId]);
-//     const events = await db.query('SELECT id, title, date FROM events WHERE organizer_id = $1 ORDER BY date DESC LIMIT 5', [userId]);
-//     res.json({ ...prof.rows[0], history: events.rows });
-//   } catch (err) {
-//     console.error('Profile fetch error:', err);
-//     res.status(500).send('Server error');
-//   }
-// });
-
-// app.put('/api/organizer/profile', upload.single('profilePicture'), async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const { name, email } = req.body;
-//     const imagePath = req.file ? req.file.filename : null;
-
-//     const result = await db.query(
-//       `UPDATE users SET name = $1, email = $2${imagePath ? `, profile_picture = $3` : ''} WHERE id = $4 RETURNING id, name, email, profile_picture`,
-//       imagePath ? [name, email, imagePath, userId] : [name, email, userId]
-//     );
-//     return res.json(result.rows[0]);
-//   } catch (err) {
-//     console.error('Profile update error:', err);
-//     return res.status(500).send('Server error');
-//   }
-// });
-
-// // Notifications
-// app.get('/api/organizer/notifications', async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const result = await db.query(
-//       `SELECT id, message, read, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 20`,
-//       [userId]
-//     );
-//     return res.json(result.rows);
-//   } catch (err) {
-//     console.error('Notifications fetch error:', err);
-//     return res.status(500).send('Server error');
-//   }
-// });
-
-// app.post('/api/organizer/notifications/:id/read', async (req, res) => {
-//   try {
-//     const notifId = req.params.id;
-//     await db.query(`UPDATE notifications SET read = TRUE WHERE id = $1`, [notifId]);
-//     return res.json({ success: true });
-//   } catch (err) {
-//     console.error('Mark read error:', err);
-//     return res.status(500).send('Server error');
-//   }
-// });
-
-// // ====== Seats ======
-
-// app.get('/api/events/:id/seats', async (req, res) => {
-//   const { id } = req.params;
-//   const result = await db.query('SELECT * FROM seats WHERE event_id = $1 ORDER BY label', [id]);
-//   res.json(result.rows);
-// });
-
-// app.put('/api/events/:eid/seats/:sid', async (req, res) => {
-//   const { eid, sid } = req.params;
-//   const { status } = req.body;
-//   const result = await db.query(
-//     'UPDATE seats SET status = $1 WHERE id = $2 AND event_id = $3 RETURNING *',
-//     [status, sid, eid]
-//   );
-//   const updated = result.rows[0];
-//   io.to(`event_${eid}`).emit('seatUpdated', { eventId: eid, seatId: updated.id, status: updated.status });
-//   res.json(updated);
-// });
-
-// // ====== Socket.IO Events ======
-// io.on('connection', socket => {
-//   console.log('Socket connected');
-
-//   socket.on('joinEvent', ({ eventId }) => {
-//     socket.join(`event_${eventId}`);
-//   });
-
-//   socket.on('leaveEvent', ({ eventId }) => {
-//     socket.leave(`event_${eventId}`);
-//   });
-
-//   socket.on('seatChange', msg => {
-//     io.to(`event_${msg.eventId}`).emit('seatUpdated', msg);
-//   });
-// });
-
-// // ====== Root Route ======
-// app.get('/', (req, res) => {
-//   res.send('API is running');
-// });
-
-// // ====== Start Server ======
-// server.listen(5000, () => console.log('Server started on http://localhost:5000'));
-
-
-
-
-
-
-
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const http = require('http');
+const bcrypt = require('bcrypt');
+const SECRET = 'your_random_secret_key';
+// const { io } = require('./socket'); 
+
+
+
 const db = require('./db');
+const eventsRoutes = require('./routes/events');
+const bookingsRoutes = require('./routes/bookings');
+const paymentsRoutes = require('./routes/payments');
+const adminRoutes = require('./routes/admin');
+const dashboardRoutes = require('./routes/dashboard');
+const userRoutes = require('./routes/users'); // includes loginUser
+// const { init } = require('./socket');
+const statsRoutes = require('./routes/stats');
+const exportRoutes = require('./routes/exportRoutes');
+const organizerRoutes = require('./routes/organizer')
+
 
 const app = express();
+const server = http.createServer(app);
+// init(server);
+// socket.init(server);
+
+// ✅ Initialize Socket.io
+const socket = require('./socket');
+socket.init(server);
+const io = socket.getIO();
+
+// Stripe Webhook (must be before express.json)
+app.use('/api/bookings/webhook', express.raw({ type: 'application/json' }));
 
 // Middleware
 app.use(cors());
@@ -287,21 +43,96 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Multer config
+// Routes
+app.use('/api/users', userRoutes); // includes login and register
+app.use('/api/events', eventsRoutes);
+app.use('/api/bookings', bookingsRoutes);
+app.use('/api/payments', paymentsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/export', exportRoutes);
+app.use('/api/organizer', organizerRoutes);
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
+
+
+
+
+// Multer config for profile uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
 
-// ====== Auth Routes ======
 
-// Register
+app.post('/api/bookings/demo', async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, error: 'Missing or invalid token' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  let userId;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    userId = decoded.user_id || decoded.id || decoded.sub;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'Token does not contain user ID' });
+    }
+  } catch (err) {
+    return res.status(403).json({ success: false, error: 'Invalid or expired token' });
+  }
+
+  const { event_id, name, age, email, seats, booking_time, qr_code, status } = req.body;
+
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Insert booking
+    await client.query(`
+      INSERT INTO bookings (event_id, name, age, email, seats, booking_time, qr_code, status, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `, [event_id, name, age, email, seats, booking_time, qr_code, status, userId]);
+
+    // Update seats_booked and get new count
+    const result = await client.query(`
+      UPDATE events 
+      SET seats_booked = seats_booked + $1 
+      WHERE id = $2 
+      RETURNING seats_booked
+    `, [seats, event_id]);
+
+    const updatedSeats = result.rows[0]?.seats_booked;
+
+    await client.query('COMMIT');
+
+    // Emit socket update
+    if (updatedSeats !== undefined) {
+      io.emit(`seat-update-${event_id}`, { seats_booked: updatedSeats });
+    }
+
+    res.json({ success: true });
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Booking insert error:', err);
+    res.status(500).json({ success: false, error: 'Insert or update failed' });
+  } finally {
+    client.release();
+  }
+});
+
 app.post('/api/register', upload.single('profilePicture'), async (req, res) => {
   const { name, email, role, password, useDefault } = req.body;
   const imagePath = useDefault === 'true' || !req.file
-    ? 'uploads/default-profile.png'
-    : req.file.path;
+    ? 'default-profile.png'
+    : req.file.filename;
 
   try {
     const existing = await db.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -309,44 +140,67 @@ app.post('/api/register', upload.single('profilePicture'), async (req, res) => {
       return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10); // ✅ hash the password
+
     await db.query(
       'INSERT INTO users(name, email, role, password, profile_picture) VALUES($1, $2, $3, $4, $5)',
-      [name, email, role, password, imagePath]
+      [name, email, role, hashedPassword, imagePath]
     );
 
-    res.status(201).json({ success: true, message: 'User registered successfully' });
+    // Fetch the newly inserted user
+    const result = await db.query('SELECT id, name, email, role FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
+    // Create JWT token
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET, {
+      expiresIn: '1d',
+    });
+
+    res.status(201).json({
+      success: true, user,
+      token, message: 'User registered successfully'
+    });
   } catch (err) {
     console.error('Registration Error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// Login
-app.post('/api/login', async (req, res) => {
-  const { emailOrName, role, password } = req.body;
-
+// Dashboard Overview Example
+app.get('/api/dashboard-overview', async (req, res) => {
   try {
-    const result = await db.query(
-      'SELECT * FROM users WHERE (email = $1 OR name = $1) AND role = $2',
-      [emailOrName, role]
-    );
+    const eventsRes = await db.query('SELECT id, name, date FROM events');
+    const events = eventsRes.rows;
 
-    const user = result.rows[0];
-    if (!user || user.password !== password) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
-    }
+    const overview = await Promise.all(events.map(async event => {
+      const q = 'SELECT SUM(quantity) AS tickets_sold, SUM(quantity * price) AS revenue FROM tickets WHERE event_id = $1';
+      const { rows } = await db.query(q, [event.id]);
+      return {
+        id: event.id,
+        name: event.name,
+        date: event.date,
+        ticketsSold: parseInt(rows[0].tickets_sold) || 0,
+        revenue: parseFloat(rows[0].revenue) || 0
+      };
+    }));
 
-    res.json({ success: true, user });
+    const upcoming = overview.filter(e => new Date(e.date) > new Date());
+
+    res.json({
+      totalEvents: events.length,
+      overview,
+      upcomingCount: upcoming.length,
+    });
   } catch (err) {
-    console.error('Login Error:', err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Root
+// Root route
 app.get('/', (req, res) => {
   res.send('Auth API is running');
 });
 
 // Start server
-app.listen(5000, () => console.log('Server running at http://localhost:5000'));
+server.listen(5000, () => console.log('Server running at http://localhost:5000'));
