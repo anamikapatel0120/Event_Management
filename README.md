@@ -64,7 +64,37 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/a
 ### Deployment
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+# Event Management App
+
+This is a web application for planning, organizing, and managing events. Users can browse upcoming events, register, and Organizer can create and manage their own events through a user-friendly interface.
+
+## Features
+
+- View a list of upcoming events
+- Create, update, and delete events
+- User registration and login
+- Password Reset Link
+- Role-based access for organizers, and attendees
+- Search and filter events
+- Stats for organizers
+- Responsive design for desktop and mobile
+
+## Tech Stack
+
+### Frontend
+- React.js
+- HTML, CSS 
+- Axios for API communication
+
+### Backend (optional)
+- Node.js with Express
+- PostgreSQL
+- JWT for user authentication
+
+
+
