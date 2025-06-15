@@ -1,0 +1,52 @@
+/* .dashboard-overview {
+  padding: 2rem;
+  background-color: #f5f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  flex-grow: 1;
+  position: relative;
+  z-index: 0;
+  width: auto;
+}
+
+.dashboard-overview h2 {
+  color: #1a202c;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.dashboard-overview ul {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.dashboard-overview li {
+  background: #ffffff;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-overview li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-overview .stat-label {
+  font-size: 1rem;
+  color: #718096;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-overview .stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2d3748;
+} */
