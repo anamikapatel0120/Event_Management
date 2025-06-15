@@ -1,0 +1,69 @@
+.TicketPage { display:flex; }
+.TicketPage main { flex:1; padding:2rem; }
+.seat-info { margin-bottom:1rem; }
+.seat-graph { width: 100%; display:flex; }
+form { display:flex; flex-direction:column; gap:0.8rem; max-width:400px; }
+input, button { padding:0.6rem; border-radius:6px; border:1px solid #ccc; }
+button { background:#3b82f6; color:#fff; border:none; cursor:pointer; transition:background 0.2s; }
+button:hover { background:#2563eb; }
+.error { color:#b91c1c; }
+@media(max-width:768px){ .TicketPage { flex-direction:column; } }
+.TicketPage {
+  display: flex;
+  /* gap: 2rem; */
+}
+
+.TicketPage main {
+  flex: 1;
+  padding: 2rem;
+}
+
+.seat-info {
+  margin-bottom: 1rem;
+}
+
+.seat-graph {
+  width: 100%;
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 400px;
+}
+
+input,
+button {
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+button {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #2563eb;
+}
+
+.error {
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .TicketPage {
+    flex-direction: column;
+  }
+}

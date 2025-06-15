@@ -1,0 +1,87 @@
+
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  /* background: linear-gradient(135deg, #4f46e5, #3b82f6); */
+  box-sizing: border-box;
+}
+
+.home-box {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  /* width: 100%; */
+  /* max-width: a; */
+  width: auto;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.home-box:hover {
+  transform: translateY(-4px);
+}
+
+.home-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2rem;
+}
+
+.home-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.home-btn {
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+  color: #ffffff;
+  width: 80%;
+}
+
+.home-btn:active {
+  transform: scale(0.97);
+}
+
+.login-btn {
+  background-color: #3b82f6; 
+}
+
+.login-btn:hover {
+  background-color: #2563eb;
+}
+
+.register-btn {
+  background-color: #3b82f6; 
+}
+
+.register-btn:hover {
+  background-color: #2563eb;
+}
+
+@media (max-width: 480px) {
+  .home-box {
+    padding: 1.75rem;
+  }
+
+  .home-title {
+    font-size: 1.5rem;
+  }
+
+  .home-btn {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+  }
+}

@@ -1,0 +1,123 @@
+.sidebar {
+  width: 250px;
+  background-color: #1f2937;
+  color: white;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar header (e.g., logo/title) */
+.sidebar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  color: #fbbf24;
+}
+
+/* Navigation list */
+.nav-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.nav-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.nav-links a:hover {
+  background-color: #374151;
+}
+
+/* Active link styling */
+.nav-links a.active {
+  background-color: #fbbf24;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.nav-links a.active .icon {
+  color: #1f2937;
+}
+
+/* Icon styling */
+.icon {
+  color: #fcd34d;
+}
+
+/* Label next to icon */
+.label {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Logout specific styling */
+/* .logout {
+  color: #f87171;
+} */
+
+/* Toggle button for sidebar collapse */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: #fbbf24;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  align-self: flex-end;
+}
+
+/* Collapsed sidebar */
+.sidebar.collapsed {
+  width: 70px;
+  padding: 0.5rem;
+}
+
+.sidebar.collapsed .logo,
+.sidebar.collapsed .label {
+  display: none;
+}
+
+.sidebar.collapsed .nav-links a {
+  justify-content: center;
+}
+
+/* Responsive sidebar on small screens */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+    padding: 1rem 0.5rem;
+  }
+
+  .sidebar .logo,
+  .label {
+    display: none;
+  }
+
+  .nav-links a {
+    justify-content: center;
+    padding: 1rem;
+  }
+}
+
+

@@ -1,0 +1,68 @@
+.MyBookingsPage {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: #f5f7fa;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.bookings-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.booking-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1 1 300px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.booking-card:hover {
+  transform: scale(1.02);
+}
+
+.booking-card.cancelled {
+  opacity: 0.6;
+  border-left: 4px solid #f87171;
+}
+
+.booking-card.active {
+  border-left: 4px solid #4ade80;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.cancel {
+  background: #f87171;
+  color: white;
+}
+
+button:not(.cancel) {
+  background: #3b82f6;
+  color: white;
+}
