@@ -91,7 +91,7 @@ This is a web application for planning, organizing, and managing events. Users c
 - HTML, CSS 
 - Axios for API communication
 
-### Backend (optional)
+### Backend 
 - Node.js with Express
 - PostgreSQL
 - JWT for user authentication
